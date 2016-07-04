@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 
 return [
+	// 全局变量规则
     '__pattern__' => [
         'name' => '\w+',
     ],
@@ -27,8 +28,11 @@ return [
 	// Blog控制器的路由
 	// 路由分组
 	'[blog]' => [
-        ':year/:month' => ['blog/archive', ['method' => 'get'], ['year' => '\d{4}', 'month' => '\d{2}']],    
+		// http://tp5.com/blog/2015/05
+        ':year/:month' => ['blog/archive', ['method' => 'get'], ['year' => '\d{4}', 'month' => '\d{2}']],
+        // http://tp5.com/blog/5
         ':id'          => ['blog/get', ['method' => 'get'], ['id' => '\d+']],
+        // http://tp5.com/blog/thinkphp
         ':name'        => ['blog/read', ['method' => 'get'], ['name' => '\w+']],
     ],
 ];
