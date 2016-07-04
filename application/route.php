@@ -24,5 +24,11 @@ return [
 	// http://tp5.com/hello/thinkphp // 正确匹配
 	// http://tp5.com/hello/thinkphp/val/value // 不会匹配
 
-	
+	// Blog控制器的路由
+	// 路由分组
+	'[blog]' => [
+        ':year/:month' => ['blog/archive', ['method' => 'get'], ['year' => '\d{4}', 'month' => '\d{2}']],    
+        ':id'          => ['blog/get', ['method' => 'get'], ['id' => '\d+']],
+        ':name'        => ['blog/read', ['method' => 'get'], ['name' => '\w+']],
+    ],
 ];
