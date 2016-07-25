@@ -17,7 +17,13 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "topthink/framework": "*"
+        "topthink/framework": "*",
+        "swiftmailer/swiftmailer": "@stable",
+        "knplabs/knp-menu": "~2.0",
+        "filp/whoops": "1.1.*",
+        "sami/sami": "3.0",
+        "endroid/qrcode": "1.*@dev",
+        "robmorgan/phinx": "*"
     },
     "extra": {
         "think-path": "thinkphp"

@@ -77,6 +77,10 @@ class App
     {
         is_null($request) && $request = Request::instance();
 
+        if ('ico' == $request->ext()) {
+            throw new HttpException(404, 'ico file not exists');
+        }
+
         $config = self::initCommon();
 
         try {
@@ -187,7 +191,7 @@ class App
         $reflect = new \ReflectionFunction($function);
         $args    = self::bindParams($reflect, $vars);
         // 记录执行信息
-        self::$debug && Log::record('[ RUN ] ' . $reflect->getFileName() . '[ ' . var_export($vars, true) . ' ]', 'info');
+        self::$debug && Log::record('[ RUN ] ' . $reflect->__toString(), 'info');
         return $reflect->invokeArgs($args);
     }
 
@@ -213,7 +217,7 @@ class App
         }
         $args = self::bindParams($reflect, $vars);
         // 记录执行信息
-        self::$debug && Log::record('[ RUN ] ' . $reflect->getFileName() . '[ ' . var_export($args, true) . ' ]', 'info');
+        self::$debug && Log::record('[ RUN ] ' . $reflect->__toString(), 'info');
         return $reflect->invokeArgs(isset($class) ? $class : null, $args);
     }
 
@@ -234,8 +238,9 @@ class App
             foreach ($params as $param) {
                 $name  = $param->getName();
                 $class = $param->getClass();
-                if ($class && 'think\Request' == $class->getName()) {
-                    $args[] = Request::instance();
+                if ($class) {
+                    $className = $class->getName();
+                    $args[]    = method_exists($className, 'instance') ? $className::instance() : new $className();
                 } elseif (1 == $type && !empty($vars)) {
                     $args[] = array_shift($vars);
                 } elseif (0 == $type && isset($vars[$name])) {
@@ -333,9 +338,9 @@ class App
         } catch (\ReflectionException $e) {
             // 操作不存在
             if (method_exists($instance, '_empty')) {
-                $method = new \ReflectionMethod($instance, '_empty');
-                $data   = $method->invokeArgs($instance, [$action, '']);
-                self::$debug && Log::record('[ RUN ] ' . $method->getFileName(), 'info');
+                $reflect = new \ReflectionMethod($instance, '_empty');
+                $data    = $reflect->invokeArgs($instance, [$action]);
+                self::$debug && Log::record('[ RUN ] ' . $reflect->__toString(), 'info');
             } else {
                 throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($instance))->getName() . '->' . $action);
             }
@@ -410,6 +415,8 @@ class App
         // 加载初始化文件
         if (is_file(APP_PATH . $module . 'init' . EXT)) {
             include APP_PATH . $module . 'init' . EXT;
+        } elseif (is_file(RUNTIME_PATH . $module . 'init' . EXT)) {
+            include RUNTIME_PATH . $module . 'init' . EXT;
         } else {
             $path = APP_PATH . $module;
             // 加载模块配置
@@ -461,12 +468,7 @@ class App
      */
     public static function routeCheck($request, array $config)
     {
-        // 检测URL禁用后缀
-        if ($config['url_deny_suffix'] && preg_match('/\.(' . $config['url_deny_suffix'] . ')$/i', $request->pathinfo())) {
-            throw new Exception('url suffix deny:' . $request->ext());
-        }
-
-        $path   = $request->path();
+        $path   = rtrim($request->path(), '/');
         $depr   = $config['pathinfo_depr'];
         $result = false;
         // 路由检测

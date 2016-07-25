@@ -77,8 +77,6 @@ return [
     'url_html_suffix'        => 'html',
     // URL普通方式参数 用于自动生成
     'url_common_param'       => false,
-    //url禁止访问的后缀
-    'url_deny_suffix'        => 'ico|png|gif|jpg',
     // URL参数方式 0 按名称成对解析 1 按顺序解析
     'url_param_type'         => 0,
     // 是否开启路由
@@ -144,17 +142,19 @@ return [
     // +----------------------------------------------------------------------
 
     'log'                    => [
-        // 日志记录方式，内置 file sae 支持扩展
-        'type' => 'File',
+        // 日志记录方式，内置 file socket 支持扩展
+        'type'  => 'File',
         // 日志保存目录
-        'path' => LOG_PATH,
+        'path'  => LOG_PATH,
+        // 日志记录级别
+        'level' => [],
     ],
 
     // +----------------------------------------------------------------------
     // | Trace设置 开启 app_trace 后 有效
     // +----------------------------------------------------------------------
     'trace'                  => [
-        // 内置Html Socket Console 支持扩展
+        // 内置Html Console 支持扩展
         'type' => 'Html',
     ],
 
